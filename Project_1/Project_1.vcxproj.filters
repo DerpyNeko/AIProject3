@@ -61,6 +61,9 @@
     <Filter Include=".bmpLoader">
       <UniqueIdentifier>{1b8c81ba-33ef-495f-9d71-65e0414d1cb9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ECS\FSM">
+      <UniqueIdentifier>{374ee13d-667c-45f5-81d7-f1a38b43ed28}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cCamera.cpp">
@@ -185,6 +188,24 @@
     </ClCompile>
     <ClCompile Include="ResourceManager.cpp">
       <Filter>.bmpLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="ecs\FSMState.cpp">
+      <Filter>ECS\FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="ecs\FSMSystem.cpp">
+      <Filter>ECS\FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="ecs\GatherState.cpp">
+      <Filter>ECS\FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="ecs\IdleState.cpp">
+      <Filter>ECS\FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="ecs\ReturnState.cpp">
+      <Filter>ECS\FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="ecs\SearchState.cpp">
+      <Filter>ECS\FSM</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -322,6 +343,27 @@
     </ClInclude>
     <ClInclude Include="ResourceManager.h">
       <Filter>.bmpLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="ecs\FSMState.h">
+      <Filter>ECS\FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="ecs\FSMSystem.h">
+      <Filter>ECS\FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="ecs\GatherState.h">
+      <Filter>ECS\FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="ecs\IdleState.h">
+      <Filter>ECS\FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="ecs\MapInfo.h">
+      <Filter>ECS\FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="ecs\ReturnState.h">
+      <Filter>ECS\FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="ecs\SearchState.h">
+      <Filter>ECS\FSM</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
