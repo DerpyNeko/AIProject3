@@ -58,6 +58,9 @@
     <Filter Include="ECS\System">
       <UniqueIdentifier>{f2cfb5e5-0130-4fd4-98c2-e58a4f9d4bfa}</UniqueIdentifier>
     </Filter>
+    <Filter Include=".bmpLoader">
+      <UniqueIdentifier>{1b8c81ba-33ef-495f-9d71-65e0414d1cb9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cCamera.cpp">
@@ -176,6 +179,12 @@
     </ClCompile>
     <ClCompile Include="ecs\bFlock.cpp">
       <Filter>ECS\Behaviour</Filter>
+    </ClCompile>
+    <ClCompile Include="BMPImage.cpp">
+      <Filter>.bmpLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceManager.cpp">
+      <Filter>.bmpLoader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -307,6 +316,12 @@
     </ClInclude>
     <ClInclude Include="ecs\Behaviours.h">
       <Filter>ECS\Behaviour</Filter>
+    </ClInclude>
+    <ClInclude Include="BMPImage.h">
+      <Filter>.bmpLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManager.h">
+      <Filter>.bmpLoader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

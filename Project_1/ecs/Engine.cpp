@@ -10,6 +10,9 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include "../BMPImage.h"
+#include "../ResourceManager.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -35,11 +38,13 @@ GLint eyeLocation_location;
 
 bool g_bDrawDebugLightSpheres = false;
 void DrawDebugLightSpheres(cLightHelper* pLightHelper, sLight* light, Entity* pDebugSphere, glm::mat4 matBall, GLuint program, glm::vec4 oldDiffuse, glm::vec3 oldScale);
+char GetColourCharacter(unsigned char r, unsigned char g, unsigned char b);
 
 void Update(void);
 void Draw(void);
 
 BehaviourManager gBehaviourManager;
+ResourceManager	 gResourceManager;
 
 std::vector<System*> gSystems;		// Container of Systems
 double startTime;
@@ -149,6 +154,26 @@ int Engine::Initialize(void)
 	{
 		std::cout << "Debug renderer is OK" << std::endl;
 	}
+
+	// LOAD IN THE .BMP FILE
+	BMPImage* bmp = new BMPImage("resourceMap.bmp");
+	//BMPImage* bmp = new BMPImage("example.bmp");
+
+	char* data = bmp->GetData();
+	unsigned long imageWidth = bmp->GetImageWidth();
+	unsigned long imageHeight = bmp->GetImageHeight();
+	//std::vector<std::vector<char>> colours(imageWidth, std::vector<char>(imageHeight));
+
+	int index = 0;
+	for (unsigned long x = 0; x < imageWidth; x++) {
+		for (unsigned long y = 0; y < imageHeight; y++) {
+			printf("%c", GetColourCharacter(data[index++], data[index++], data[index++]));
+			//colours[x][y] = GetColourCharacter(data[index++], data[index++], data[index++]);
+		}
+		printf("\n");
+	}
+
+
 
 	::g_pCamera = new cCamera();
 
@@ -428,3 +453,13 @@ void DrawDebugLightSpheres(cLightHelper* pLightHelper, sLight* light, Entity* pD
 	sphereProperties->bIsVisible = false;
 }
 
+char GetColourCharacter(unsigned char r, unsigned char g, unsigned char b)
+{
+	//std::cout << (int)r << " " << (int)g << " " << (int)b << std::endl;
+	if (r == 255 && g == 0 && b == 0)		return 'r';
+	if (r == 0 && g == 255 && b == 0)		return 'g';
+	if (r == 0 && g == 0 && b == 255)	return 'b';
+	if (r == 255 && g == 255 && b == 255)	return 'w';
+	if (r == 0 && g == 0 && b == 0)		return '_';
+	return 'x';
+}
