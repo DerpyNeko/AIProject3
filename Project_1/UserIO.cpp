@@ -251,7 +251,6 @@ void ProcessAsyncKeys(GLFWwindow* window)
 {
 	Transform* playerTransform = g_player->GetComponent<Transform>();
 	Velocity* playerVelocity = g_player->GetComponent<Velocity>();
-	Velocity* ringVelocity = g_ring->GetComponent<Velocity>();
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)	// "fowards"
 	{

@@ -15,17 +15,13 @@ void LoadModelTypes(cVAOMeshManager* pTheVAOMeshManager, GLuint shaderProgramID)
 	sphereInfo.meshFileName = "Sphere_n_uv.ply";
 	pTheVAOMeshManager->LoadModelIntoVAO(sphereInfo, shaderProgramID);
 
-	sModelDrawInfo spherePointInfo;
-	spherePointInfo.meshFileName = "SpherePoint_n_uv.ply";
-	pTheVAOMeshManager->LoadModelIntoVAO(spherePointInfo, shaderProgramID);
-
 	sModelDrawInfo sphereInvertedNormalsInfo;
 	sphereInvertedNormalsInfo.meshFileName = "Sphere_n_uv_INVERTED_NORMALS.ply";
 	pTheVAOMeshManager->LoadModelIntoVAO(sphereInvertedNormalsInfo, shaderProgramID);
 
-	sModelDrawInfo ringInfo;
-	ringInfo.meshFileName = "Ring.ply";
-	pTheVAOMeshManager->LoadModelIntoVAO(ringInfo, shaderProgramID);
+	sModelDrawInfo Cube;
+	Cube.meshFileName = "Cube.ply";
+	pTheVAOMeshManager->LoadModelIntoVAO(Cube, shaderProgramID);
 
 	// At this point, mesh in in GPU
 	std::cout << "Mesh was loaded OK" << std::endl;
@@ -76,7 +72,7 @@ void LoadModelsIntoScene()
 		Properties* properties1 = g_player->AddComponent<Properties>();
 		properties1->setDiffuseColour(glm::vec3(0.0f, 0.0f, 0.0f));
 		properties1->bDontLight = true;
-		properties1->meshName = "SpherePoint_n_uv.ply";
+		properties1->meshName = "Sphere_n_uv.ply";
 		properties1->type = eType::PLAYER;
 
 		Transform* playerTransform = g_player->AddComponent<Transform>();
@@ -89,76 +85,22 @@ void LoadModelsIntoScene()
 		v->velocity = glm::vec3(0.001, 0.001, 0.0);
 	}
 
-	// ENTITY #2 - Player Radius
-	{
-		g_ring = EntityManager::CreateEntity();
-		g_ring->name = "Ring";
-
-		Properties* properties1 = g_ring->AddComponent<Properties>();
-		properties1->setDiffuseColour(glm::vec3(0.0f, 1.0f, 1.0f));
-		properties1->bDontLight = true;
-		properties1->meshName = "Ring.ply";
-		properties1->type = eType::NONE;
-
-		Transform* transform1 = g_ring->AddComponent<Transform>();
-		transform1->position = glm::vec3(0.0f, 0.0f, 0.0f);
-		transform1->setUniformScale(0.5f);
-		transform1->orientation = glm::quat(0.0f, 0.0f, 1.0f, 0.0f);
-		transform1->sphereRadius = transform1->scale.x;
-
-		g_ring->AddComponent<Velocity>();
-	}
-
 	// ENTITY #3-15 - Entities
 	for (int i = 0; i < 12; i++)
 	{
-		Entity* entity2 = EntityManager::CreateEntity();
-		entity2->name = "Entity" + std::to_string(i);
+		Entity* entity = EntityManager::CreateEntity();
+		entity->name = "Cube";
+		Properties* properties = entity->AddComponent<Properties>();
+		properties->setDiffuseColour(glm::vec3(0.0f, 1.0f, 0.0f));
+		properties->meshName = "Cube.ply";
+		properties->bDontLight = true;
+		properties->type = eType::NONE;
 
-		Properties* properties2 = entity2->AddComponent<Properties>();
-		properties2->setDiffuseColour(glm::vec3(1.0f, 0.0f, 0.0f));
-		properties2->bDontLight = true;
-		properties2->meshName = "SpherePoint_n_uv.ply";
-		properties2->type = eType::OTHER;
-
-		float x = ((float(rand()) / float(RAND_MAX)) * (445 - (-445))) + (-445);
-		float y = ((float(rand()) / float(RAND_MAX)) * (445 - (-445))) + (-445);
-
-		Transform* transform2 = entity2->AddComponent<Transform>();
-		transform2->position = glm::vec3(x, y, 0.0f);
-		transform2->setUniformScale(15.0f);
-		transform2->orientation = glm::quat(0.0f, 0.0f, 0.0f, 0.0f);
-		transform2->sphereRadius = transform2->scale.x;
-
-		Velocity* velocity = entity2->AddComponent<Velocity>();
-		velocity->velocity = glm::normalize(glm::vec3(sin(rand()), sin(rand()), 0.0f));
+		Transform* transform = entity->AddComponent<Transform>();
+		transform->position = glm::vec3(0.0f, 0.0f, 0.0f);
+		transform->setUniformScale(1.0f);
 	}
 
-	// ENTITY #16-21 - Path Nodes
-	for (int i = 0; i < 5; i++)
-	{
-		Entity* entity2 = EntityManager::CreateEntity();
-		entity2->name = "PathNode" + std::to_string(i);
-
-		Properties* properties2 = entity2->AddComponent<Properties>();
-		properties2->setDiffuseColour(glm::vec3(0.0f, 0.0f, 1.0f));
-		properties2->bDontLight = true;
-		properties2->meshName = "Sphere_n_uv.ply";
-		properties2->type = eType::NODE;
-		properties2->bIsWireFrame = true;
-
-		int randomNum = rand() % 891 + (-445);
-		float x = ((float(rand()) / float(RAND_MAX)) * (445 - (-445))) + (-445);
-		float y = ((float(rand()) / float(RAND_MAX)) * (445 - (-445))) + (-445);
-
-		Transform* transform2 = entity2->AddComponent<Transform>();
-		transform2->position = glm::vec3(x, y, 0.0f);
-		transform2->setUniformScale(15.0f);
-		transform2->orientation = glm::quat(0.0f, 1.0f, 0.0f, 0.0f);
-		transform2->sphereRadius = transform2->scale.x;
-
-		entity2->AddComponent<Velocity>();
-	}
 
 	// ENTITY #22 - Debug Sphere
 	{

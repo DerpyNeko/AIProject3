@@ -13,7 +13,13 @@
 #include "../BMPImage.h"
 #include "../ResourceManager.h"
 
+#include "FSMSystem.h"
 #include "MapInfo.h"
+
+#include "IdleState.h"
+#include "SearchState.h"
+#include "GatherState.h"
+#include "ReturnState.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,6 +47,8 @@ GLint eyeLocation_location;
 bool g_bDrawDebugLightSpheres = false;
 void DrawDebugLightSpheres(cLightHelper* pLightHelper, sLight* light, Entity* pDebugSphere, glm::mat4 matBall, GLuint program, glm::vec4 oldDiffuse, glm::vec3 oldScale);
 char GetColourCharacter(unsigned char r, unsigned char g, unsigned char b);
+void CreateGraph(std::vector<std::vector<char>> bmpVec);
+void DrawMaze(std::vector<std::vector<char>> bmpVec);
 
 void Update(void);
 void Draw(void);
@@ -48,9 +56,13 @@ void Draw(void);
 BehaviourManager gBehaviourManager;
 ResourceManager	 gResourceManager;
 
-std::vector<System*> gSystems;		// Container of Systems
+int gNumResources = 2;
+int startingNode = 0;
+std::vector<int> resources;
+std::vector<int> graph[VERTEX];
+
+std::vector<System*> gSystems;
 double startTime;
-int gNumResources = 3;
 
 static void error_callback(int error, const char* description)
 {
@@ -74,7 +86,7 @@ int Engine::Initialize(void)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-	window = glfwCreateWindow(900, 900, "Project 2", NULL, NULL);
+	window = glfwCreateWindow(900, 900, "Project 3", NULL, NULL);
 
 	if (!window)
 	{
@@ -157,26 +169,6 @@ int Engine::Initialize(void)
 		std::cout << "Debug renderer is OK" << std::endl;
 	}
 
-	// LOAD IN THE .BMP FILE
-	BMPImage* bmp = new BMPImage("resourceMap.bmp");
-	//BMPImage* bmp = new BMPImage("example.bmp");
-
-	char* data = bmp->GetData();
-	unsigned long imageWidth = bmp->GetImageWidth();
-	unsigned long imageHeight = bmp->GetImageHeight();
-	//std::vector<std::vector<char>> colours(imageWidth, std::vector<char>(imageHeight));
-
-	int index = 0;
-	for (unsigned long x = 0; x < imageWidth; x++) {
-		for (unsigned long y = 0; y < imageHeight; y++) {
-			printf("%c", GetColourCharacter(data[index++], data[index++], data[index++]));
-			//colours[x][y] = GetColourCharacter(data[index++], data[index++], data[index++]);
-		}
-		printf("\n");
-	}
-
-
-
 	::g_pCamera = new cCamera();
 
 	CreateLights(program);
@@ -197,7 +189,7 @@ int Engine::Initialize(void)
 */
 int Engine::Destroy(void)
 {
-	unsigned int numSystems = (unsigned int) (gSystems.size());
+	unsigned int numSystems = (unsigned int)(gSystems.size());
 	for (unsigned int i = 0; i < numSystems; i++)
 	{
 		delete gSystems[i];
@@ -239,6 +231,53 @@ int Engine::Run(void)
 	// Get the current time to start with
 	startTime = glfwGetTime();
 
+	BMPImage* bmp = new BMPImage("assets/resourceMap.bmp");
+
+	char* data = bmp->GetData();
+	unsigned long imageWidth = bmp->GetImageWidth();
+	unsigned long imageHeight = bmp->GetImageHeight();
+
+	std::vector<std::vector<char>> bmpVec(imageHeight, std::vector<char>(imageWidth));
+
+	int index = 0;
+	unsigned short r, g, b;
+	for (unsigned long x = 0; x < imageWidth; x++) {
+		for (unsigned long y = 0; y < imageHeight; y++) {
+			bmpVec[x][y] = GetColourCharacter(data[index++], data[index++], data[index++]);
+		}
+	}
+
+	for (std::vector<char> v : bmpVec)
+	{
+		for (char c : v)
+		{
+			printf("%c", c);
+		}
+
+		printf("\n");
+	}
+
+	CreateGraph(bmpVec);
+
+	//FSMSystem fsmSystem;
+
+	//FSMState* stateIdle = new IdleState();
+	//FSMState* stateSearch = new SearchState();
+	//FSMState* stateGather = new GatherState();
+	//FSMState* stateReturn = new ReturnState();
+
+	//stateIdle->AddTransition(1, stateSearch);
+	//stateSearch->AddTransition(1, stateGather);
+	//stateGather->AddTransition(1, stateReturn);
+	//stateReturn->AddTransition(1, stateSearch);
+
+	//fsmSystem.AddState(stateIdle);
+	//fsmSystem.AddState(stateSearch);
+	//fsmSystem.AddState(stateGather);
+	//fsmSystem.AddState(stateReturn);
+
+	//fsmSystem.Start();
+
 	// Draw the "scene" (run the program)
 	while (!glfwWindowShouldClose(window))
 	{
@@ -271,44 +310,6 @@ int Engine::Run(void)
 
 		glUniformMatrix4fv(matView_location, 1, GL_FALSE, glm::value_ptr(matView));
 		glUniformMatrix4fv(matProj_location, 1, GL_FALSE, glm::value_ptr(matProjection));
-
-		for (sLight* light : g_Lights)
-		{
-			glUniform4f(light->position_UniLoc, light->position.x,
-				light->position.y, light->position.z, 1.0f);
-
-			glUniform4f(light->diffuse_UniLoc, light->diffuse.x,
-				light->diffuse.y, light->diffuse.z, 1.0f);
-
-			glUniform4f(light->param2_UniLoc, 1.0f, 0.0f, 0.0f, 0.0f);
-
-			glUniform4f(light->atten_UniLoc, light->atten.x,
-				light->atten.y, light->atten.z, light->atten.w);
-
-			Entity* pDebugSphere = EntityManager::FindEntity("DebugSphere");
-			Properties* sphereProperties = pDebugSphere->GetComponent<Properties>();
-			Transform* sphereTransform = pDebugSphere->GetComponent<Transform>();
-
-			sphereProperties->bIsVisible = true;
-			sphereProperties->bDontLight = true;
-
-			glm::vec4 oldDiffuse = sphereProperties->materialDiffuse;
-			glm::vec3 oldScale = sphereTransform->scale;
-
-			sphereProperties->setDiffuseColour(glm::vec3(255.0f / 255.0f, 105.0f / 255.0f, 180.0f / 255.0f));
-			sphereProperties->bUseVertexColour = false;
-			sphereTransform->position = glm::vec3(light->position);
-			glm::mat4 matBall(1.0f);
-
-			sphereProperties->materialDiffuse = oldDiffuse;
-			sphereTransform->setUniformScale(0.5f);
-			DrawObject(pDebugSphere, matBall, program);
-
-			if (::g_bDrawDebugLightSpheres)
-			{
-				DrawDebugLightSpheres(pLightHelper, light, pDebugSphere, matBall, program, oldDiffuse, oldScale);
-			}
-		}//for ( sLight* light : g_Lights
 
 		{
 			// Draw the skybox first 
@@ -345,6 +346,10 @@ int Engine::Run(void)
 			glUniform1f(useSkyBoxTexture_UniLoc, (float)GL_FALSE);
 		}
 
+		DrawMaze(bmpVec);
+
+		//fsmSystem.Update();
+
 		Update();
 
 		//::g_pDebugRendererACTUAL->RenderDebugObjects(matView, matProjection, deltaTime);
@@ -376,16 +381,6 @@ void Update(void)
 		{
 			s->Process(EntityManager::GetEntityList(), dt);
 		}
-
-		Transform* playerTransform = g_player->GetComponent<Transform>();
-		Velocity* playerVelocity = g_player->GetComponent<Velocity>();
-
-		Transform* ringTransform = g_ring->GetComponent<Transform>();
-		Velocity* ringVelocity = g_ring->GetComponent<Velocity>();
-
-		ringVelocity->velocity = playerVelocity->velocity;
-		ringTransform->position = playerTransform->position;
-
 	}
 
 	Draw();
@@ -465,4 +460,115 @@ char GetColourCharacter(unsigned char r, unsigned char g, unsigned char b)
 	if (r == 255 && g == 255 && b == 255)		return 'w';
 	if (r == 0 && g == 0 && b == 0)					return '_';
 	return 'x';
+}
+
+void CreateGraph(std::vector<std::vector<char>> bmpVec)
+{
+	int i = 0;
+	for (unsigned int a = 0; a < bmpVec.size(); a++)
+	{
+		for (unsigned int b = 0; b < bmpVec[a].size(); b++)
+		{
+			if (bmpVec[a][b] != '_')
+			{
+				// Node to the right of current
+				if (b + 1 < bmpVec[a].size())
+				{
+					if (bmpVec[a][b + 1] != '_')
+					{
+						graph[i].push_back(i + 1);
+						graph[i + 1].push_back(i);
+					}
+				}
+				if (a + 1 < bmpVec.size())
+				{
+					// Node below the current
+					if (bmpVec[a + 1][b] != '_')
+					{
+						graph[i].push_back(i + bmpVec.size());
+						graph[i + bmpVec.size()].push_back(i);
+					}
+				}
+				if (a + 1 < bmpVec.size() && b + 1 < bmpVec[a].size())
+				{
+					// Node below and to the right of current
+					if (bmpVec[a + 1][b + 1] != '_')
+					{
+						graph[i].push_back(i + bmpVec.size() + 1);
+						graph[i + bmpVec.size() + 1].push_back(i);
+					}
+				}
+			}
+
+			if (bmpVec[a][b] == 'r')
+			{
+				resources.push_back(i);
+			}
+
+			if (bmpVec[a][b] == 'g')
+			{
+				startingNode = i;
+			}
+
+			i++;
+		}
+	}
+}
+
+void DrawMaze(std::vector<std::vector<char>> bmpVec)
+{
+	Transform* playerTransform = g_player->GetComponent<Transform>();
+
+	int x = 240;
+	int y = -180;
+
+	for (unsigned int a = 0; a < bmpVec.size(); a++)
+	{
+		for (unsigned int b = 0; b < bmpVec[a].size(); b++)
+		{
+
+			glm::mat4 matCube(1.0f);
+			Entity* pCube = EntityManager::FindEntity("Cube");
+			Transform* cubeTransform = pCube->GetComponent<Transform>();
+			cubeTransform->position = glm::vec3(x, y, 0);
+			cubeTransform->scale = glm::vec3(15.0f, 15.0f, 7.0f);
+			Properties* cubeProperty = pCube->GetComponent<Properties>();
+
+			if (bmpVec[a][b] == 'r')
+			{
+				cubeProperty->setDiffuseColour(glm::vec3(1.0f, 0.0f, 0.0f));
+			}
+			else if (bmpVec[a][b] == 'g')
+			{
+				cubeProperty->setDiffuseColour(glm::vec3(0.0f, 1.0f, 0.0f));
+
+				playerTransform->position = cubeTransform->position;
+				playerTransform->position.y += 1.0f;
+			}
+			else if (bmpVec[a][b] == 'b')
+			{
+				cubeProperty->setDiffuseColour(glm::vec3(0.0f, 0.0f, 1.0f));
+			}
+			else if (bmpVec[a][b] == 'y')
+			{
+				cubeProperty->setDiffuseColour(glm::vec3(1.0f, 1.0f, 0.0f));
+			}
+			if (bmpVec[a][b] == 'w')
+			{
+				cubeProperty->setDiffuseColour(glm::vec3(1.0f, 1.0f, 1.0f));
+			}
+			else if (bmpVec[a][b] == '_')
+			{
+				cubeProperty->setDiffuseColour(glm::vec3(0.0f, 0.0f, 0.0f));
+			}
+
+			DrawObject(pCube, matCube, program);
+
+			x -= 30;
+		}
+		y += 30;
+		x = 240;
+	}
+	x = 240;
+	y = -180;
 }

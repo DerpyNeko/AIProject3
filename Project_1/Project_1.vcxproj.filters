@@ -34,12 +34,6 @@
     <Filter Include="Physics">
       <UniqueIdentifier>{ddacd96b-b4bd-484d-8fc5-e464cbd57ddb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shader Stuff">
-      <UniqueIdentifier>{d5e6af57-9126-4eec-ba7a-b2ac493093e8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shader Stuff\Shaders">
-      <UniqueIdentifier>{c2370e7f-a6f3-4c7e-bfa6-ef03c8b14bfa}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Utilities">
       <UniqueIdentifier>{4aa629a1-17de-4c05-ada0-50af1bc754d5}</UniqueIdentifier>
     </Filter>
@@ -63,6 +57,12 @@
     </Filter>
     <Filter Include="ECS\FSM">
       <UniqueIdentifier>{374ee13d-667c-45f5-81d7-f1a38b43ed28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Physics\Shader Stuff">
+      <UniqueIdentifier>{d5e6af57-9126-4eec-ba7a-b2ac493093e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Physics\Shader Stuff\Shaders">
+      <UniqueIdentifier>{c2370e7f-a6f3-4c7e-bfa6-ef03c8b14bfa}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -97,10 +97,10 @@
       <Filter>Physics</Filter>
     </ClCompile>
     <ClCompile Include="cShader.cpp">
-      <Filter>Shader Stuff</Filter>
+      <Filter>Physics\Shader Stuff</Filter>
     </ClCompile>
     <ClCompile Include="cShaderManager.cpp">
-      <Filter>Shader Stuff</Filter>
+      <Filter>Physics\Shader Stuff</Filter>
     </ClCompile>
     <ClCompile Include="cGLColourHelper.cpp">
       <Filter>Utilities</Filter>
@@ -252,7 +252,7 @@
       <Filter>Physics</Filter>
     </ClInclude>
     <ClInclude Include="cShaderManager.h">
-      <Filter>Shader Stuff</Filter>
+      <Filter>Physics\Shader Stuff</Filter>
     </ClInclude>
     <ClInclude Include="cGLColourHelper.h">
       <Filter>Utilities</Filter>
@@ -368,10 +368,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\shaders\fragment01.glsl">
-      <Filter>Shader Stuff\Shaders</Filter>
+      <Filter>Physics\Shader Stuff\Shaders</Filter>
     </None>
     <None Include="assets\shaders\vertex01.glsl">
-      <Filter>Shader Stuff\Shaders</Filter>
+      <Filter>Physics\Shader Stuff\Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -1,8 +1,7 @@
-#ifndef SearchState_H
-#define SearchState_H
+#ifndef _HG_fSearchState_
+#define _HG_fSearchState_
 
 #include "FSMState.h"
-
 #include "MapInfo.h"
 
 class SearchState : public FSMState {

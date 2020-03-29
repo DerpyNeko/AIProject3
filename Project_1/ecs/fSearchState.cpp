@@ -1,6 +1,6 @@
-﻿#include "SearchState.h"
+﻿#include "fSearchState.h"
 
-SearchState::SearchState(void) : FSMState("Search State") {
+SearchState::SearchState(void): FSMState("Search State") {
 }
 
 SearchState::~SearchState(void) {
