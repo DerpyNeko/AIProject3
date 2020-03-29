@@ -1,7 +1,6 @@
 #include "IdleState.h"
 
-IdleState::IdleState(void)
-	: FSMState("Idle State") {
+IdleState::IdleState(void) : FSMState("Idle State") {
 }
 
 IdleState::~IdleState(void) {
@@ -12,9 +11,9 @@ void IdleState::Update(void) {
 }
 
 void IdleState::EnterState(void) {
-	// printf("IdleState: Entered\n");
+	printf("IdleState: Entered\n");
 }
 
 void IdleState::ExitState(void) {
-	// printf("IdleState: Exited\n");
+	printf("IdleState: Exited\n");
 }

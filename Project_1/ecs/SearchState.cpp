@@ -11,14 +11,14 @@ int SearchState::minDistance(std::vector<int> dist)
 	int min = INT_MAX;
 	int min_index = 0;
 
-	for (int v = 0; v < VERTEX; v++)
-	{
-		if (dist[v] <= min)
-		{
-			min = dist[v];
-			min_index = v;
-		}
-	}
+	//for (int v = 0; v < VERTEX; v++)
+	//{
+	//	if (dist[v] <= min)
+	//	{
+	//		min = dist[v];
+	//		min_index = v;
+	//	}
+	//}
 
 	return min_index;
 }
@@ -30,33 +30,33 @@ int SearchState::distBetween(int u, int v)
 
 std::vector<int> SearchState::Dijkstra(std::vector<int> graph[], int source)
 {
-	std::vector<int> dist(VERTEX);
-	std::vector<int> previous(VERTEX);
+	//std::vector<int> dist(VERTEX);
+	std::vector<int> previous(1);
 
-	for (int v : *graph)
-	{
-		dist[v] = INT_MAX;
-		previous[v] = -1;
-	}
+	//for (int v : *graph)
+	//{
+	//	dist[v] = INT_MAX;
+	//	previous[v] = -1;
+	//}
 
-	dist[source] = 0;
+	//dist[source] = 0;
 
-	std::vector<int> Q = *graph;
-	while (Q.size() > 0)
-	{
-		int u = minDistance(dist);
-		Q.erase(Q.begin() + u);
+	//std::vector<int> Q = *graph;
+	//while (Q.size() > 0)
+	//{
+	//	int u = minDistance(dist);
+	//	Q.erase(Q.begin() + u);
 
-		for (int v : graph[u])
-		{
-			int alt = dist[u] + distBetween(u, v);
-			if (alt < dist[v])
-			{
-				dist[v] = alt;
-				previous[v] = u;
-			}
-		}
-	}
+	//	for (int v : graph[u])
+	//	{
+	//		int alt = dist[u] + distBetween(u, v);
+	//		if (alt < dist[v])
+	//		{
+	//			dist[v] = alt;
+	//			previous[v] = u;
+	//		}
+	//	}
+	//}
 
 	return previous;
 }
@@ -83,7 +83,8 @@ void SearchState::Update(void) {
 	}
 	else {
 		printf("SearchState: Found %d resources!\n", gNumResources);
-		Dijkstra(graph, startingNode);
+		//std::vector<int> v = Dijkstra(graph, startingNode);
+
 		mCurrentCondition = 1;
 	}
 }

@@ -21,6 +21,8 @@
 #include "GatherState.h"
 #include "ReturnState.h"
 
+#include "Graph.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -47,6 +49,7 @@ GLint eyeLocation_location;
 bool g_bDrawDebugLightSpheres = false;
 void DrawDebugLightSpheres(cLightHelper* pLightHelper, sLight* light, Entity* pDebugSphere, glm::mat4 matBall, GLuint program, glm::vec4 oldDiffuse, glm::vec3 oldScale);
 char GetColourCharacter(unsigned char r, unsigned char g, unsigned char b);
+void swap(std::vector<std::vector<char>>& vec, unsigned long height, unsigned long width);
 void CreateGraph(std::vector<std::vector<char>> bmpVec);
 void DrawMaze(std::vector<std::vector<char>> bmpVec);
 
@@ -59,7 +62,7 @@ ResourceManager	 gResourceManager;
 int gNumResources = 2;
 int startingNode = 0;
 std::vector<int> resources;
-std::vector<int> graph[VERTEX];
+Graph* graph;
 
 std::vector<System*> gSystems;
 double startTime;
@@ -247,6 +250,8 @@ int Engine::Run(void)
 		}
 	}
 
+	swap(bmpVec, imageHeight, imageWidth);
+
 	for (std::vector<char> v : bmpVec)
 	{
 		for (char c : v)
@@ -259,24 +264,24 @@ int Engine::Run(void)
 
 	CreateGraph(bmpVec);
 
-	//FSMSystem fsmSystem;
+	FSMSystem fsmSystem;
 
-	//FSMState* stateIdle = new IdleState();
-	//FSMState* stateSearch = new SearchState();
-	//FSMState* stateGather = new GatherState();
-	//FSMState* stateReturn = new ReturnState();
+	FSMState* stateIdle = new IdleState();
+	FSMState* stateSearch = new SearchState();
+	FSMState* stateGather = new GatherState();
+	FSMState* stateReturn = new ReturnState();
 
-	//stateIdle->AddTransition(1, stateSearch);
-	//stateSearch->AddTransition(1, stateGather);
-	//stateGather->AddTransition(1, stateReturn);
-	//stateReturn->AddTransition(1, stateSearch);
+	stateIdle->AddTransition(1, stateSearch);
+	stateSearch->AddTransition(1, stateGather);
+	stateGather->AddTransition(1, stateReturn);
+	stateReturn->AddTransition(1, stateSearch);
 
-	//fsmSystem.AddState(stateIdle);
-	//fsmSystem.AddState(stateSearch);
-	//fsmSystem.AddState(stateGather);
-	//fsmSystem.AddState(stateReturn);
+	fsmSystem.AddState(stateIdle);
+	fsmSystem.AddState(stateSearch);
+	fsmSystem.AddState(stateGather);
+	fsmSystem.AddState(stateReturn);
 
-	//fsmSystem.Start();
+	fsmSystem.Start();
 
 	// Draw the "scene" (run the program)
 	while (!glfwWindowShouldClose(window))
@@ -345,6 +350,11 @@ int Engine::Run(void)
 			skyBoxProperties->bIsVisible = false;
 			glUniform1f(useSkyBoxTexture_UniLoc, (float)GL_FALSE);
 		}
+
+		Entity* pFloor = EntityManager::FindEntity("Floor");
+		Transform* floorTransform = pFloor->GetComponent<Transform>();
+		floorTransform->position = glm::vec3(255.0f, 45.0f, 0.0f);
+		floorTransform->scale = glm::vec3(imageHeight * 15, imageWidth * 15, 1.0f);
 
 		DrawMaze(bmpVec);
 
@@ -462,57 +472,149 @@ char GetColourCharacter(unsigned char r, unsigned char g, unsigned char b)
 	return 'x';
 }
 
+void swap(std::vector<std::vector<char>>& vec, unsigned long height, unsigned long width)
+{
+	std::vector<std::vector<char>> temp(height, std::vector<char>(width));
+	int tx = height - 1;
+
+	for (unsigned long x = 0; x < width; x++) {
+		for (unsigned long y = 0; y < height; y++) {
+			temp[x][y] = vec[tx][y];
+		}
+		tx--;
+	}
+
+	vec = temp;
+}
+
 void CreateGraph(std::vector<std::vector<char>> bmpVec)
 {
+	graph = new Graph();
+	int x = 240;
+	int y = -180;
 	int i = 0;
 	for (unsigned int a = 0; a < bmpVec.size(); a++)
 	{
 		for (unsigned int b = 0; b < bmpVec[a].size(); b++)
 		{
-			if (bmpVec[a][b] != '_')
-			{
-				// Node to the right of current
-				if (b + 1 < bmpVec[a].size())
-				{
-					if (bmpVec[a][b + 1] != '_')
-					{
-						graph[i].push_back(i + 1);
-						graph[i + 1].push_back(i);
-					}
-				}
-				if (a + 1 < bmpVec.size())
-				{
-					// Node below the current
-					if (bmpVec[a + 1][b] != '_')
-					{
-						graph[i].push_back(i + bmpVec.size());
-						graph[i + bmpVec.size()].push_back(i);
-					}
-				}
-				if (a + 1 < bmpVec.size() && b + 1 < bmpVec[a].size())
-				{
-					// Node below and to the right of current
-					if (bmpVec[a + 1][b + 1] != '_')
-					{
-						graph[i].push_back(i + bmpVec.size() + 1);
-						graph[i + bmpVec.size() + 1].push_back(i);
-					}
-				}
-			}
-
-			if (bmpVec[a][b] == 'r')
-			{
-				resources.push_back(i);
-			}
-
 			if (bmpVec[a][b] == 'g')
-			{
-				startingNode = i;
-			}
+				graph->CreateNode(bmpVec[a][b], i, Vertex(x, y, 0), true);
+			else
+				graph->CreateNode(bmpVec[a][b], i, Vertex(x, y, 0), false);
 
+			x -= 30;
 			i++;
 		}
+		y += 30;
+		x = 240;
 	}
+	x = 240;
+	y = -180;
+
+	for (int i = 0; i < graph->nodes.size(); i++)
+	{
+		if (graph->nodes[i]->id != '_')
+		{
+			graph->AddEdge(graph->nodes[i], graph->nodes[i - 15], 10);			
+			graph->AddEdge(graph->nodes[i], graph->nodes[i + 1], 10);
+			graph->AddEdge(graph->nodes[i], graph->nodes[i + 16], 10);
+			graph->AddEdge(graph->nodes[i], graph->nodes[i + 17], 10);
+		}
+	}
+
+	//for (unsigned int a = 0; a < bmpVec.size(); a++)
+	//{
+	//	for (unsigned int b = 0; b < bmpVec[a].size(); b++)
+	//	{
+	//		if (bmpVec[a][b] == 'r')
+	//		{
+	//			cubeProperty->setDiffuseColour(glm::vec3(1.0f, 0.0f, 0.0f));
+	//		}
+	//		else if (bmpVec[a][b] == 'g')
+	//		{
+	//			cubeProperty->setDiffuseColour(glm::vec3(0.0f, 1.0f, 0.0f));
+
+	//			playerTransform->position = cubeTransform->position;
+	//			playerTransform->position.z -= 5.0f;
+	//		}
+	//		else if (bmpVec[a][b] == 'b')
+	//		{
+	//			cubeProperty->setDiffuseColour(glm::vec3(0.0f, 0.0f, 1.0f));
+	//		}
+	//		else if (bmpVec[a][b] == 'y')
+	//		{
+	//			cubeProperty->setDiffuseColour(glm::vec3(1.0f, 1.0f, 0.0f));
+	//		}
+	//		if (bmpVec[a][b] == 'w')
+	//		{
+	//			cubeProperty->setDiffuseColour(glm::vec3(1.0f, 1.0f, 1.0f));
+	//		}
+	//		else if (bmpVec[a][b] == '_')
+	//		{
+	//			cubeProperty->setDiffuseColour(glm::vec3(0.0f, 0.0f, 0.0f));
+	//		}
+
+	//		DrawObject(pCube, matCube, program);
+
+	//		x -= 30;
+	//	}
+	//	y += 30;
+	//	x = 240;
+	//}
+	//x = 240;
+	//y = -180;
+
+
+
+	//int i = 0;
+	//for (unsigned int a = 0; a < bmpVec.size(); a++)
+	//{
+	//	for (unsigned int b = 0; b < bmpVec[a].size(); b++)
+	//	{
+	//		if (bmpVec[a][b] != '_')
+	//		{
+	//			// Node to the right of current
+	//			if (b + 1 < bmpVec[a].size())
+	//			{
+	//				if (bmpVec[a][b + 1] != '_')
+	//				{
+	//					graph[i].push_back(i + 1);
+	//					graph[i + 1].push_back(i);
+	//				}
+	//			}
+	//			if (a + 1 < bmpVec.size())
+	//			{
+	//				// Node below the current
+	//				if (bmpVec[a + 1][b] != '_')
+	//				{
+	//					graph[i].push_back(i + bmpVec.size());
+	//					graph[i + bmpVec.size()].push_back(i);
+	//				}
+	//			}
+	//			if (a + 1 < bmpVec.size() && b + 1 < bmpVec[a].size())
+	//			{
+	//				// Node below and to the right of current
+	//				if (bmpVec[a + 1][b + 1] != '_')
+	//				{
+	//					graph[i].push_back(i + bmpVec.size() + 1);
+	//					graph[i + bmpVec.size() + 1].push_back(i);
+	//				}
+	//			}
+	//		}
+
+	//		if (bmpVec[a][b] == 'r')
+	//		{
+	//			resources.push_back(i);
+	//		}
+
+	//		if (bmpVec[a][b] == 'g')
+	//		{
+	//			startingNode = i;
+	//		}
+
+	//		i++;
+	//	}
+	//}
 }
 
 void DrawMaze(std::vector<std::vector<char>> bmpVec)
@@ -520,7 +622,7 @@ void DrawMaze(std::vector<std::vector<char>> bmpVec)
 	Transform* playerTransform = g_player->GetComponent<Transform>();
 
 	int x = 240;
-	int y = -180;
+	int y = 270;
 
 	for (unsigned int a = 0; a < bmpVec.size(); a++)
 	{
@@ -531,7 +633,7 @@ void DrawMaze(std::vector<std::vector<char>> bmpVec)
 			Entity* pCube = EntityManager::FindEntity("Cube");
 			Transform* cubeTransform = pCube->GetComponent<Transform>();
 			cubeTransform->position = glm::vec3(x, y, 0);
-			cubeTransform->scale = glm::vec3(15.0f, 15.0f, 7.0f);
+			cubeTransform->scale = glm::vec3(13.0f, 13.0f, 7.0f);
 			Properties* cubeProperty = pCube->GetComponent<Properties>();
 
 			if (bmpVec[a][b] == 'r')
@@ -543,7 +645,7 @@ void DrawMaze(std::vector<std::vector<char>> bmpVec)
 				cubeProperty->setDiffuseColour(glm::vec3(0.0f, 1.0f, 0.0f));
 
 				playerTransform->position = cubeTransform->position;
-				playerTransform->position.y += 1.0f;
+				playerTransform->position.z -= 5.0f;
 			}
 			else if (bmpVec[a][b] == 'b')
 			{
@@ -566,9 +668,9 @@ void DrawMaze(std::vector<std::vector<char>> bmpVec)
 
 			x -= 30;
 		}
-		y += 30;
+		y -= 30;
 		x = 240;
 	}
 	x = 240;
-	y = -180;
+	y = 270;
 }

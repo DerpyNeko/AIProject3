@@ -19,6 +19,10 @@ void LoadModelTypes(cVAOMeshManager* pTheVAOMeshManager, GLuint shaderProgramID)
 	sphereInvertedNormalsInfo.meshFileName = "Sphere_n_uv_INVERTED_NORMALS.ply";
 	pTheVAOMeshManager->LoadModelIntoVAO(sphereInvertedNormalsInfo, shaderProgramID);
 
+	sModelDrawInfo Floor;
+	Floor.meshFileName = "Floor.ply";
+	pTheVAOMeshManager->LoadModelIntoVAO(Floor, shaderProgramID);
+
 	sModelDrawInfo Cube;
 	Cube.meshFileName = "Cube.ply";
 	pTheVAOMeshManager->LoadModelIntoVAO(Cube, shaderProgramID);
@@ -70,14 +74,14 @@ void LoadModelsIntoScene()
 		g_player->name = "Player";
 
 		Properties* properties1 = g_player->AddComponent<Properties>();
-		properties1->setDiffuseColour(glm::vec3(0.0f, 0.0f, 0.0f));
+		properties1->setDiffuseColour(glm::vec3(0.0f, 1.0f, 1.0f));
 		properties1->bDontLight = true;
 		properties1->meshName = "Sphere_n_uv.ply";
 		properties1->type = eType::PLAYER;
 
 		Transform* playerTransform = g_player->AddComponent<Transform>();
 		playerTransform->position = glm::vec3(0.0f, 0.0f, 0.0f);
-		playerTransform->setUniformScale(15.0f);
+		playerTransform->setUniformScale(12.0f);
 		playerTransform->orientation = glm::quat(0.0f, 0.0f, 1.0f, 0.0f);
 		playerTransform->sphereRadius = playerTransform->scale.x;
 
@@ -85,8 +89,17 @@ void LoadModelsIntoScene()
 		v->velocity = glm::vec3(0.001, 0.001, 0.0);
 	}
 
+	{
+		Entity* entity = EntityManager::CreateEntity();
+		entity->name = "Floor";
+		Transform* transform = entity->AddComponent<Transform>();
+		Properties* properties = entity->AddComponent<Properties>();
+		properties->setDiffuseColour(glm::vec3(0.0f, 0.0f, 0.0f));
+		properties->meshName = "Floor.ply";
+		properties->bDontLight = true;
+	}
+
 	// ENTITY #3-15 - Entities
-	for (int i = 0; i < 12; i++)
 	{
 		Entity* entity = EntityManager::CreateEntity();
 		entity->name = "Cube";
@@ -100,7 +113,6 @@ void LoadModelsIntoScene()
 		transform->position = glm::vec3(0.0f, 0.0f, 0.0f);
 		transform->setUniformScale(1.0f);
 	}
-
 
 	// ENTITY #22 - Debug Sphere
 	{

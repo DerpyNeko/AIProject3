@@ -207,6 +207,9 @@
     <ClCompile Include="ecs\SearchState.cpp">
       <Filter>ECS\FSM</Filter>
     </ClCompile>
+    <ClCompile Include="ecs\Graph.cpp">
+      <Filter>ECS\FSM</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cCamera.h">
@@ -363,6 +366,9 @@
       <Filter>ECS\FSM</Filter>
     </ClInclude>
     <ClInclude Include="ecs\SearchState.h">
+      <Filter>ECS\FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="ecs\Graph.h">
       <Filter>ECS\FSM</Filter>
     </ClInclude>
   </ItemGroup>

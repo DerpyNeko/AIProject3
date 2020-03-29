@@ -162,6 +162,7 @@
     <ClCompile Include="ecs\FSMState.cpp" />
     <ClCompile Include="ecs\FSMSystem.cpp" />
     <ClCompile Include="ecs\GatherState.cpp" />
+    <ClCompile Include="ecs\Graph.cpp" />
     <ClCompile Include="ecs\IdleState.cpp" />
     <ClCompile Include="ecs\ReturnState.cpp" />
     <ClCompile Include="ecs\sCollisionSystem.cpp" />
@@ -217,6 +218,7 @@
     <ClInclude Include="ecs\FSMState.h" />
     <ClInclude Include="ecs\FSMSystem.h" />
     <ClInclude Include="ecs\GatherState.h" />
+    <ClInclude Include="ecs\Graph.h" />
     <ClInclude Include="ecs\IdleState.h" />
     <ClInclude Include="ecs\MapInfo.h" />
     <ClInclude Include="ecs\ReturnState.h" />
