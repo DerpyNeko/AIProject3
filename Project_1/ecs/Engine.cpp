@@ -13,6 +13,8 @@
 #include "../BMPImage.h"
 #include "../ResourceManager.h"
 
+#include "MapInfo.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -48,7 +50,7 @@ ResourceManager	 gResourceManager;
 
 std::vector<System*> gSystems;		// Container of Systems
 double startTime;
-
+int gNumResources = 3;
 
 static void error_callback(int error, const char* description)
 {
@@ -456,10 +458,11 @@ void DrawDebugLightSpheres(cLightHelper* pLightHelper, sLight* light, Entity* pD
 char GetColourCharacter(unsigned char r, unsigned char g, unsigned char b)
 {
 	//std::cout << (int)r << " " << (int)g << " " << (int)b << std::endl;
-	if (r == 255 && g == 0 && b == 0)		return 'r';
-	if (r == 0 && g == 255 && b == 0)		return 'g';
-	if (r == 0 && g == 0 && b == 255)	return 'b';
-	if (r == 255 && g == 255 && b == 255)	return 'w';
-	if (r == 0 && g == 0 && b == 0)		return '_';
+	if (r == 255 && g == 0 && b == 0)				return 'r';
+	if (r == 0 && g == 255 && b == 0)				return 'g';
+	if (r == 0 && g == 0 && b == 255)				return 'b';
+	if (r == 255 && g == 255 && b == 0)			return 'y';
+	if (r == 255 && g == 255 && b == 255)		return 'w';
+	if (r == 0 && g == 0 && b == 0)					return '_';
 	return 'x';
 }
