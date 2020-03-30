@@ -1,44 +1,32 @@
 #include "GatherState.h"
-#include "bPathFollow.h"
 #include "Behaviour.h"
 #include "../globalStuff.h"
 
-#include <ctime>
-#include <iostream>
-
-GatherState::GatherState(void) : FSMState("Search State") 
+GatherState::GatherState(void) : FSMState("Search State"), currentTime(0), resourcesHeld(0), startTime(0)
 {
 }
 
-GatherState::~GatherState(void) 
+GatherState::~GatherState(void)
 {
 }
 
 void GatherState::Update(void)
 {
-	// if not at destination
-	// follow path
-	if (!atResource)
+	if (bHasCollected)
 	{
+		std::cout << "Arrived" << std::endl;
 
-	}
-
-	// if at resource block
-	// wait 7 seconds
-	if (atResource)
-	{
 		currentTime = (float)std::clock();
 		if ((currentTime - startTime) / (float)CLOCKS_PER_SEC > 7.0f)
 		{
 			resourcesHeld++;
-			std::cout << "Resource gathered." << std::endl;
+			//resources.erase(resources.begin());
+			std::cout << "Resource gathered" << std::endl;
 
 			// gathering done
-			this->ExitState();
+			mCurrentCondition = 1;
 		}
-
 	}
-	
 }
 
 void GatherState::EnterState(void) 
@@ -48,7 +36,6 @@ void GatherState::EnterState(void)
 	resourcesHeld = 0;
 	startTime = (float)std::clock();
 	currentTime = 0.0f;
-	atResource = false;
 
 	Path* path = new Path();
 
@@ -59,8 +46,6 @@ void GatherState::EnterState(void)
 		pos.y = dijkstraPathNodes.at(i)->position.y;
 		pos.z = -5.0f;
 
-		std::cout << pos.x << " " << pos.y << std::endl;
-
 		path->pathNodes.push_back(pos);
 	}
 
@@ -69,6 +54,6 @@ void GatherState::EnterState(void)
 
 void GatherState::ExitState(void) 
 {
-	mCurrentCondition = 2;
 	printf("GatherState: Exited\n");
+	std::cout << "Resources: " << resources.size() << std::endl;
 }

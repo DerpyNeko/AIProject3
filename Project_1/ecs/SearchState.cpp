@@ -1,5 +1,4 @@
 ﻿#include "SearchState.h"
-#include <iostream>
 
 SearchState::SearchState(void) : FSMState("Search State") 
 {
@@ -7,17 +6,6 @@ SearchState::SearchState(void) : FSMState("Search State")
 
 SearchState::~SearchState(void) 
 {
-}
-
-bool SearchState::IsNodeInOpenList(std::vector<Node*> openList, Node* child)
-{
-	for (int i = 0; i < openList.size(); i++)
-	{
-		if (openList[i] == child)
-			return true;
-
-	}
-	return false;
 }
 
 Node* SearchState::Dijkstra(Node* rootNode, Graph* graph)
@@ -60,6 +48,46 @@ Node* SearchState::Dijkstra(Node* rootNode, Graph* graph)
 		currNode->visited = true;
 		if (currNode->hasGoal)
 		{
+			std::cout << "NODES:" << std::endl;
+			Node* n = graph->nodes[resources[0]];
+
+			while (n->parent != NULL)
+			{
+				std::cout << n->index << " : ";
+				for (std::pair<Node*, float> p : n->parent->children)
+				{
+					if (p.first == n)
+					{
+						std::cout << p.second << std::endl;
+						dijkstraPathNodes.push_back(p.first);
+						break;
+					}
+
+				}
+				n = n->parent;
+			}
+
+			dijkstraPathNodes.push_back(graph->nodes[startNode]);
+			std::cout << graph->nodes[startNode]->index << std::endl;
+			std::reverse(dijkstraPathNodes.begin(), dijkstraPathNodes.end());
+
+			std::cout << "REVERSED NODES:" << std::endl;
+			for (int i = 0; i < dijkstraPathNodes.size(); i++)
+			{
+				std::cout << dijkstraPathNodes[i]->index;
+				for (std::pair<Node*, float> pair : dijkstraPathNodes[i]->children)
+				{
+					if (i + 1 < 16)
+					{
+						if (pair.first == dijkstraPathNodes[i + 1])
+						{
+							std::cout << " : " << pair.second << std::endl;
+							break;
+						}
+					}
+				}
+			}
+			std::cout << std::endl;
 			return currNode;
 		}
 
@@ -82,44 +110,11 @@ Node* SearchState::Dijkstra(Node* rootNode, Graph* graph)
 			}
 		}
 
-		if (currNode->index == resources[0])
-		{
-			std::cout << currNode->index << std::endl;
-			graph->PrintParents(true);
-		}
-
-	}
-
-	std::cout << "NODES:" << std::endl;
-	Node* n = graph->nodes[resources[0]];
-
-	while (n->parent != NULL)
-	{
-		std::cout << n->index << " : ";
-		for (std::pair<Node*, float> p : n->parent->children)
-		{
-			if (p.first == n)
-			{
-				std::cout << p.second << std::endl;
-				dijkstraPathNodes.push_back(p.first);
-				break;
-			}
-			
-		}
-
-		n = n->parent;
-	}
-
-	dijkstraPathNodes.push_back(graph->nodes[startNode]);
-	std::reverse(dijkstraPathNodes.begin(), dijkstraPathNodes.end());
-
-	std::cout << "REVERSED" << std::endl;
-		std::cout << "Positions: " << std::endl;
-	for (Node* n : dijkstraPathNodes)
-	{
-		std::cout << n->index << std::endl;
-		std::cout << n->position.x << " " << n->position.y << std::endl;
-
+		//if (currNode->index == resources[0])
+		//{
+		//	std::cout << currNode->index << std::endl;
+		//	graph->PrintParents(true);
+		//}
 
 	}
 
@@ -135,13 +130,13 @@ void SearchState::Update(void)
 	else {
 		printf("SearchState: Found %d resources!\n", gNumResources);
 
-		// graph->nodes[resources[0]]->hasGoal = true;
-		std::cout << "STarting node: " << graph->nodes[startNode]->index << " Resource: " << graph->nodes[resources[0]]->index << std::endl;
+		graph->nodes[resources[0]]->hasGoal = true;
+		std::cout << "Starting node: " << graph->nodes[startNode]->index << " Resource: " << graph->nodes[resources[0]]->index << std::endl;
 		Node* n = Dijkstra(graph->nodes[startNode], graph);
 
 		if (n == graph->nodes[resources[0]])
 		{
-			resources.erase(resources.begin());
+			gNumResources--;
 		}
 
 		mCurrentCondition = 1;

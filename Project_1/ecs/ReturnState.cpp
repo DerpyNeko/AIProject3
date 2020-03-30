@@ -1,14 +1,89 @@
 #include "ReturnState.h"
-#include <thread>
-#include <chrono>
 
-ReturnState::ReturnState(void)
-	: FSMState("Search State") {
+ReturnState::ReturnState(void) : FSMState("Search State") 
+{
 }
 
-ReturnState::~ReturnState(void) {
+ReturnState::~ReturnState(void) 
+{
 }
 
+float CalculateHeuristics(Node* node, Node* goal)
+{
+    float D = 1;
+    float dx = abs(node->position.x - goal->position.x);
+    float dy = abs(node->position.y - goal->position.y);
+    return D * (dx + dy);
+}
+
+Node* AStar(Node* rootNode, Graph* graph, Node* goal)
+{
+    graph->ResetGraph();
+
+    rootNode->gCostSoFar = 0;
+    rootNode->hDistance = CalculateHeuristics(rootNode, goal);
+
+    std::vector<Node*> closedList;
+    std::vector<Node*> openList;
+    openList.push_back(rootNode);
+
+    while (!openList.empty())
+    {
+        float minCost = FLT_MAX;
+        int minIndex = 0;
+        Node* currNode;
+        //find node with the lowest cost from root node and heuristic distance from the goal node
+        for (size_t i = 0; i < openList.size(); i++)
+        {
+            if (openList[i]->gCostSoFar + openList[i]->hDistance < minCost)
+            {
+                minCost = openList[i]->gCostSoFar + openList[i]->hDistance;
+                minIndex = i;
+            }
+        }
+
+        //remove current node from open list and add to closed list
+        currNode = openList[minIndex];
+        for (auto iter = openList.begin(); iter != openList.end(); ++iter)
+        {
+            if (*iter == currNode)
+            {
+                openList.erase(iter);
+                break;
+            }
+        }
+        closedList.push_back(currNode);
+
+        std::cout << currNode->id << std::endl;
+        currNode->visited = true;
+        if (currNode->hasGoal)
+        {
+            return currNode;
+        }
+
+        //Go through every child node node 
+        for (std::pair <Node*, float> child : currNode->children)
+        {
+            if (child.first->visited == false)
+            {
+                float weightSoFar = currNode->gCostSoFar + child.second;
+                if (weightSoFar < child.first->gCostSoFar)
+                {
+                    child.first->gCostSoFar = weightSoFar;
+                    child.first->parent = currNode;
+                    if (!IsNodeInOpenList(openList, child.first))
+                    {
+                        child.first->hDistance = CalculateHeuristics(child.first, goal);
+                        openList.push_back(child.first);
+                    }
+                }
+            }
+        }
+        graph->PrintParents(true);
+    }
+
+    return NULL;
+}
 void ReturnState::Update(void)
 {
 	//std::this_thread::sleep_for(std::chrono::seconds(2));
@@ -61,9 +136,9 @@ void ReturnState::Update(void)
 }
 
 void ReturnState::EnterState(void) {
-	// printf("ReturnState: Entered\n");
+	printf("ReturnState: Entered\n");
 }
 
 void ReturnState::ExitState(void) {
-	// printf("ReturnState: Exited\n");
+	printf("ReturnState: Exited\n");
 }

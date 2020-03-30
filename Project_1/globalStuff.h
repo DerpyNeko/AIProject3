@@ -47,9 +47,7 @@ extern BehaviourManager gBehaviourManager;
 extern double startTime;
 
 extern Entity* g_player;
-extern Entity* g_ring;
+extern Entity* g_box;
 extern std::vector<Entity*> g_bullets;
-
-extern bool isReversed;
 
 #endif	// _globalStuff_HG_

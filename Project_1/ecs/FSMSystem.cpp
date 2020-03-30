@@ -4,7 +4,6 @@ FSMSystem::FSMSystem(void)
 	: mIsRunning(false)
 	, mCurrentState(0)
 {
-
 }
 
 FSMSystem::~FSMSystem(void)

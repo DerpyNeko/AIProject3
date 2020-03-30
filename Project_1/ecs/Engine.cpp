@@ -152,15 +152,10 @@ int Engine::Initialize(void)
 	::g_pVAOMeshManager = new cVAOMeshManager();
 	::g_pTextureManager = new cBasicTextureManager();
 
-	// Loading the uniform variables here (rather than the inner draw loop)
-	//GLint objectColour_UniLoc = glGetUniformLocation(program, "objectColour");
-
-	//GLint matModel_location = glGetUniformLocation(program, "matModel");
 	matView_location = glGetUniformLocation(program, "matView");
 	matProj_location = glGetUniformLocation(program, "matProj");
 	eyeLocation_location = glGetUniformLocation(program, "eyeLocation");
 
-	// Note that this point is to the +interface+ but we're creating the actual object
 	::g_pDebugRendererACTUAL = new cDebugRenderer();
 	::g_pDebugRenderer = (iDebugRenderer*)::g_pDebugRendererACTUAL;
 
@@ -364,8 +359,6 @@ int Engine::Run(void)
 
 		Update();
 
-		//::g_pDebugRendererACTUAL->RenderDebugObjects(matView, matProjection, deltaTime);
-
 		glfwSwapBuffers(window);
 
 		glfwPollEvents();
@@ -392,6 +385,19 @@ void Update(void)
 		for (System* s : gSystems)
 		{
 			s->Process(EntityManager::GetEntityList(), dt);
+		}
+
+		if (bHasCollected)
+		{
+			Transform* playerTransform = g_player->GetComponent<Transform>();
+			Velocity* playerVelocity = g_player->GetComponent<Velocity>();
+
+			Transform* boxTransform = g_box->GetComponent<Transform>();
+			Velocity* boxVelocity = g_box->GetComponent<Velocity>();
+
+			boxVelocity->velocity = playerVelocity->velocity;
+			boxTransform->position.x = playerTransform->position.x;
+			boxTransform->position.y = playerTransform->position.y;
 		}
 	}
 
@@ -464,13 +470,12 @@ void DrawDebugLightSpheres(cLightHelper* pLightHelper, sLight* light, Entity* pD
 
 char GetColourCharacter(unsigned char r, unsigned char g, unsigned char b)
 {
-	//std::cout << (int)r << " " << (int)g << " " << (int)b << std::endl;
-	if (r == 255 && g == 0 && b == 0)				return 'r';
-	if (r == 0 && g == 255 && b == 0)				return 'g';
-	if (r == 0 && g == 0 && b == 255)				return 'b';
+	if (r == 255 && g == 0 && b == 0)			return 'r';
+	if (r == 0 && g == 255 && b == 0)			return 'g';
+	if (r == 0 && g == 0 && b == 255)			return 'b';
 	if (r == 255 && g == 255 && b == 0)			return 'y';
 	if (r == 255 && g == 255 && b == 255)		return 'w';
-	if (r == 0 && g == 0 && b == 0)					return '_';
+	if (r == 0 && g == 0 && b == 0)				return '_';
 	return 'x';
 }
 
@@ -569,7 +574,6 @@ void DrawMaze(std::vector<std::vector<char>> bmpVec)
 	{
 		for (unsigned int b = 0; b < bmpVec[a].size(); b++)
 		{
-
 			glm::mat4 matCube(1.0f);
 			Entity* pCube = EntityManager::FindEntity("Cube");
 			Transform* cubeTransform = pCube->GetComponent<Transform>();
@@ -579,7 +583,10 @@ void DrawMaze(std::vector<std::vector<char>> bmpVec)
 
 			if (bmpVec[a][b] == 'r')
 			{
-				cubeProperty->setDiffuseColour(glm::vec3(1.0f, 0.0f, 0.0f));
+				if (bHasCollected)
+					cubeProperty->setDiffuseColour(glm::vec3(1.0f, 1.0f, 1.0f));
+				else
+					cubeProperty->setDiffuseColour(glm::vec3(1.0f, 0.0f, 0.0f));
 			}
 			else if (bmpVec[a][b] == 'g')
 			{

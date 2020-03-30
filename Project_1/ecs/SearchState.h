@@ -2,7 +2,6 @@
 #define SearchState_H
 
 #include "FSMState.h"
-
 #include "MapInfo.h"
 
 class SearchState : public FSMState {
@@ -16,7 +15,6 @@ public:
 	virtual void ExitState(void);
 
 	Node* Dijkstra(Node* rootNode, Graph* graph);
-	bool IsNodeInOpenList(std::vector<Node*> openList, Node* child);
 };
 
 #endif

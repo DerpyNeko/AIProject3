@@ -1,5 +1,4 @@
 #include "Graph.h"
-
 #include <iostream>
 
 Graph::Graph() {}
@@ -34,8 +33,6 @@ void Graph::AddEdge(Node* parent, Node* child, float weight)
 		edge.first = child;
 		edge.second = weight;
 		parent->children.push_back(edge);
-
-		//std::cout << "Parent: " << parent->id << " (" << parent->index << ") -> " << child->id << " (" << child->index << ") " << tempWeight << std::endl;
 	}
 }
 

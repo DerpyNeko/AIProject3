@@ -4,7 +4,7 @@
 #include "ecs/Behaviours.h"
 
 Entity* g_player;
-Entity* g_ring;
+Entity* g_box;
 
 std::vector<Entity*> g_bullets;
 
@@ -99,7 +99,23 @@ void LoadModelsIntoScene()
 		properties->bDontLight = true;
 	}
 
-	// ENTITY #3-15 - Entities
+	{
+		g_box = EntityManager::CreateEntity();
+		g_box->name = "Resource";
+		Properties* properties = g_box->AddComponent<Properties>();
+		properties->setDiffuseColour(glm::vec3(1.0f, 0.0f, 0.0f));
+		properties->meshName = "Cube.ply";
+		properties->bDontLight = true;
+		properties->type = eType::NONE;
+
+		Transform* transform = g_box->AddComponent<Transform>();
+		transform->position = glm::vec3(0.0f, 0.0f, -8.0f);
+		transform->scale = glm::vec3(13.0f, 13.0f, 1.0f);
+
+		Velocity* v = g_box->AddComponent<Velocity>();
+		v->velocity = glm::vec3(0.001, 0.001, 0.0);
+	}
+
 	{
 		Entity* entity = EntityManager::CreateEntity();
 		entity->name = "Cube";
@@ -114,7 +130,6 @@ void LoadModelsIntoScene()
 		transform->setUniformScale(1.0f);
 	}
 
-	// ENTITY #22 - Debug Sphere
 	{
 		Entity* entity = EntityManager::CreateEntity();
 		entity->name = "DebugSphere";

@@ -2,8 +2,9 @@
 #define _HG_PathFollowBehaviour_
 
 #include "Behaviour.h"
-
 #include <glm/glm.hpp>
+
+extern bool bHasCollected;
 
 struct PathNode
 {

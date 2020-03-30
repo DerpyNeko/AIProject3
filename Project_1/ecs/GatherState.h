@@ -2,8 +2,8 @@
 #define GatherState_H
 
 #include "FSMState.h"
-
 #include "MapInfo.h"
+#include "bPathFollow.h"
 
 class GatherState : public FSMState {
 public:
@@ -16,7 +16,6 @@ public:
 	virtual void ExitState(void);
 
 	int resourcesHeld;
-	bool atResource;
 
 	float startTime;
 	float currentTime;

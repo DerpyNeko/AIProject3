@@ -109,12 +109,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		gBehaviourManager.SetBehaviour(g_player, new PathFollowBehaviour(g_player, path));
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS)
-	{
-		isReversed = !isReversed;
-		std::cout << "Key 9: isReversed: " << isReversed << std::endl;
-	}
-
 	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
 	{
 		//	isStopped = !isStopped;

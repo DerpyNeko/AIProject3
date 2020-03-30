@@ -52,9 +52,6 @@
     <Filter Include="ECS\System">
       <UniqueIdentifier>{f2cfb5e5-0130-4fd4-98c2-e58a4f9d4bfa}</UniqueIdentifier>
     </Filter>
-    <Filter Include=".bmpLoader">
-      <UniqueIdentifier>{1b8c81ba-33ef-495f-9d71-65e0414d1cb9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ECS\FSM">
       <UniqueIdentifier>{374ee13d-667c-45f5-81d7-f1a38b43ed28}</UniqueIdentifier>
     </Filter>
@@ -63,6 +60,9 @@
     </Filter>
     <Filter Include="Physics\Shader Stuff\Shaders">
       <UniqueIdentifier>{c2370e7f-a6f3-4c7e-bfa6-ef03c8b14bfa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="bmpLoader">
+      <UniqueIdentifier>{1b8c81ba-33ef-495f-9d71-65e0414d1cb9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -184,10 +184,10 @@
       <Filter>ECS\Behaviour</Filter>
     </ClCompile>
     <ClCompile Include="BMPImage.cpp">
-      <Filter>.bmpLoader</Filter>
+      <Filter>bmpLoader</Filter>
     </ClCompile>
     <ClCompile Include="ResourceManager.cpp">
-      <Filter>.bmpLoader</Filter>
+      <Filter>bmpLoader</Filter>
     </ClCompile>
     <ClCompile Include="ecs\FSMState.cpp">
       <Filter>ECS\FSM</Filter>
@@ -342,10 +342,10 @@
       <Filter>ECS\Behaviour</Filter>
     </ClInclude>
     <ClInclude Include="BMPImage.h">
-      <Filter>.bmpLoader</Filter>
+      <Filter>bmpLoader</Filter>
     </ClInclude>
     <ClInclude Include="ResourceManager.h">
-      <Filter>.bmpLoader</Filter>
+      <Filter>bmpLoader</Filter>
     </ClInclude>
     <ClInclude Include="ecs\FSMState.h">
       <Filter>ECS\FSM</Filter>
