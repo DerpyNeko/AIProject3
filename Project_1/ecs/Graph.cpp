@@ -21,7 +21,6 @@ void Graph::CreateNode(int id, int index, Vertex position, bool bHasGoal)
 
 void Graph::AddEdge(Node* parent, Node* child, float weight)
 {
-	float tempWeight = weight;
 
 	if (child->id != '_')
 	{
@@ -29,23 +28,14 @@ void Graph::AddEdge(Node* parent, Node* child, float weight)
 
 		if (child->id == 'y')
 		{
-			tempWeight *= 2;
-		}
-
-		edge.first = child;
-		edge.second = tempWeight;
-		parent->children.push_back(edge);
-
-		std::pair<Node*, float> reverseEdge;
-
-		if (parent->id == 'y')
-		{
 			weight *= 2;
 		}
 
-		reverseEdge.first = parent;
-		reverseEdge.second = weight;
-		child->children.push_back(reverseEdge);
+		edge.first = child;
+		edge.second = weight;
+		parent->children.push_back(edge);
+
+		//std::cout << "Parent: " << parent->id << " (" << parent->index << ") -> " << child->id << " (" << child->index << ") " << tempWeight << std::endl;
 	}
 }
 
@@ -74,19 +64,31 @@ void Graph::PrintParents(bool includeCost)
 {
 	for (Node*& currNode : this->nodes)
 	{
-		std::cout << "Node: " << currNode->id << " -> ";
-		if (currNode->parent != NULL)
-		{
-			std::cout << currNode->parent->id;
+		if (currNode->id != '_')
+		{	
+			if (currNode->parent != NULL)
+			{
+				std::cout << "Node: " << currNode->index << " -> " << currNode->parent->index;
+
+				for (std::pair<Node*, float> p : currNode->parent->children)
+				{
+					if (p.first == currNode)
+					{
+						std::cout << " Edge: " << p.second;
+						break;
+					}
+				}
+			}
+			else
+			{
+				continue;
+			}
+			
+			if (includeCost)
+			{
+				std::cout <<" cost so far: " << currNode->gCostSoFar;
+			}
+			std::cout << std::endl;
 		}
-		else
-		{
-			std::cout << "NULL";
-		}
-		if (includeCost)
-		{
-			std::cout << " cost so far: " << currNode->gCostSoFar << " hDist= " << currNode->hDistance << " f= " << currNode->gCostSoFar + currNode->hDistance;
-		}
-		std::cout << std::endl;
 	}
 }

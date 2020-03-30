@@ -5,7 +5,7 @@ bool isReversed = false;
 bool isBorked = false;
 
 PathFollowBehaviour::PathFollowBehaviour(Entity* entity, Path* path)
-	: mEntity(entity), mPath(path), mCurrentGoal(0), mPathRadius(15.0f)
+	: mEntity(entity), mPath(path), mCurrentGoal(0), mPathRadius(1.0f)
 {
 }
 
@@ -35,7 +35,7 @@ void PathFollowBehaviour::Update(float dt)
 		}
 	}
 
-	nodeProperties->setDiffuseColour(glm::vec3(0.0f, 1.0f, 0.0f));
+	//nodeProperties->setDiffuseColour(glm::vec3(0.0f, 1.0f, 0.0f));
 
 	float dist = glm::distance(agentTransform->position, pathNode.position);
 
@@ -44,19 +44,19 @@ void PathFollowBehaviour::Update(float dt)
 		if (mCurrentGoal == mPath->pathNodes.size() - 1 || isReversed && mCurrentGoal == 0)
 		{
 
-			for (Entity* node : EntityManager::GetEntityList())
-			{
-				Properties* p = node->GetComponent<Properties>();
+			//for (Entity* node : EntityManager::GetEntityList())
+			//{
+			//	Properties* p = node->GetComponent<Properties>();
 
-				if (p->type == eType::OTHER)
-					p->setDiffuseColour(glm::vec3(0.0f, 0.0f, 1.0f));
-			}
+			//	if (p->type == eType::OTHER)
+			//		p->setDiffuseColour(glm::vec3(0.0f, 0.0f, 1.0f));
+			//}
 
 			agentVelocity->velocity = glm::vec3(0.001f, 0.001f, 0.0f);
 			return;
 		}
 
-		nodeProperties->setDiffuseColour(glm::vec3(0.0f, 0.0f, 1.0f));
+		//nodeProperties->setDiffuseColour(glm::vec3(0.0f, 0.0f, 1.0f));
 		isBorked = false;
 
 		if (isReversed && mCurrentGoal != 0)

@@ -14,6 +14,12 @@ public:
 
 	virtual void EnterState(void);
 	virtual void ExitState(void);
+
+	int resourcesHeld;
+	bool atResource;
+
+	float startTime;
+	float currentTime;
 };
 
 #endif

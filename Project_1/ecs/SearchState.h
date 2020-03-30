@@ -15,9 +15,8 @@ public:
 	virtual void EnterState(void);
 	virtual void ExitState(void);
 
-	std::vector<int> Dijkstra(std::vector<int> graph[], int source);
-	int minDistance(std::vector<int> dist);
-	int distBetween(int u, int v);
+	Node* Dijkstra(Node* rootNode, Graph* graph);
+	bool IsNodeInOpenList(std::vector<Node*> openList, Node* child);
 };
 
 #endif

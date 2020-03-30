@@ -59,9 +59,11 @@ void Draw(void);
 BehaviourManager gBehaviourManager;
 ResourceManager	 gResourceManager;
 
-int gNumResources = 2;
-int startingNode = 0;
+int gNumResources = 0;
+int homeNode = 0;
+int startNode = 0;
 std::vector<int> resources;
+std::vector<Node*> dijkstraPathNodes;
 Graph* graph;
 
 std::vector<System*> gSystems;
@@ -358,7 +360,7 @@ int Engine::Run(void)
 
 		DrawMaze(bmpVec);
 
-		//fsmSystem.Update();
+		fsmSystem.Update();
 
 		Update();
 
@@ -489,138 +491,77 @@ void swap(std::vector<std::vector<char>>& vec, unsigned long height, unsigned lo
 
 void CreateGraph(std::vector<std::vector<char>> bmpVec)
 {
+	Transform* playerTransform = g_player->GetComponent<Transform>();
+
 	graph = new Graph();
 	int x = 240;
-	int y = -180;
+	int y = 270;
 	int i = 0;
 	for (unsigned int a = 0; a < bmpVec.size(); a++)
 	{
 		for (unsigned int b = 0; b < bmpVec[a].size(); b++)
 		{
-			if (bmpVec[a][b] == 'g')
-				graph->CreateNode(bmpVec[a][b], i, Vertex(x, y, 0), true);
-			else
-				graph->CreateNode(bmpVec[a][b], i, Vertex(x, y, 0), false);
+			graph->CreateNode(bmpVec[a][b], i, Vertex(x, y, 0), false);
 
-			x -= 30;
+			if (bmpVec[a][b] == 'r')
+			{
+				resources.push_back(i);
+				gNumResources = resources.size();
+
+			}
+			else if (bmpVec[a][b] == 'b')
+			{
+				homeNode = i;
+			}
+			else if (bmpVec[a][b] == 'g')
+			{
+				startNode = i;
+				playerTransform->position = glm::vec3(x, y, -5.0f);
+			}
 			i++;
+			x -= 30;
 		}
-		y += 30;
+		y -= 30;
 		x = 240;
 	}
 	x = 240;
-	y = -180;
+	y = 270;
 
+	// Current node will add edges to the upper right, right, lower right and below nodes
 	for (int i = 0; i < graph->nodes.size(); i++)
 	{
 		if (graph->nodes[i]->id != '_')
 		{
-			graph->AddEdge(graph->nodes[i], graph->nodes[i - 15], 10);			
-			graph->AddEdge(graph->nodes[i], graph->nodes[i + 1], 10);
-			graph->AddEdge(graph->nodes[i], graph->nodes[i + 16], 10);
-			graph->AddEdge(graph->nodes[i], graph->nodes[i + 17], 10);
+			if (graph->nodes[i + 1]->id != '_')
+			{
+				graph->AddEdge(graph->nodes[i], graph->nodes[i - 15], 14);
+				graph->AddEdge(graph->nodes[i], graph->nodes[i + 1], 10);
+
+				graph->AddEdge(graph->nodes[i - 15], graph->nodes[i], 14);
+				graph->AddEdge(graph->nodes[i + 1], graph->nodes[i], 10);
+			}
+			if (graph->nodes[i + 16]->id != '_')
+			{
+				graph->AddEdge(graph->nodes[i], graph->nodes[i + 16], 10);
+				graph->AddEdge(graph->nodes[i], graph->nodes[i + 17], 14);
+
+				graph->AddEdge(graph->nodes[i + 16], graph->nodes[i], 10);
+				graph->AddEdge(graph->nodes[i + 17], graph->nodes[i], 14);
+			}
+			if (graph->nodes[i + 1]->id == '_')
+			{
+				if (graph->nodes[i + 16]->id != '_')
+				{
+					graph->AddEdge(graph->nodes[i], graph->nodes[i + 16], 10);
+					graph->AddEdge(graph->nodes[i + 16], graph->nodes[i], 10);
+				}
+			}
 		}
 	}
-
-	//for (unsigned int a = 0; a < bmpVec.size(); a++)
-	//{
-	//	for (unsigned int b = 0; b < bmpVec[a].size(); b++)
-	//	{
-	//		if (bmpVec[a][b] == 'r')
-	//		{
-	//			cubeProperty->setDiffuseColour(glm::vec3(1.0f, 0.0f, 0.0f));
-	//		}
-	//		else if (bmpVec[a][b] == 'g')
-	//		{
-	//			cubeProperty->setDiffuseColour(glm::vec3(0.0f, 1.0f, 0.0f));
-
-	//			playerTransform->position = cubeTransform->position;
-	//			playerTransform->position.z -= 5.0f;
-	//		}
-	//		else if (bmpVec[a][b] == 'b')
-	//		{
-	//			cubeProperty->setDiffuseColour(glm::vec3(0.0f, 0.0f, 1.0f));
-	//		}
-	//		else if (bmpVec[a][b] == 'y')
-	//		{
-	//			cubeProperty->setDiffuseColour(glm::vec3(1.0f, 1.0f, 0.0f));
-	//		}
-	//		if (bmpVec[a][b] == 'w')
-	//		{
-	//			cubeProperty->setDiffuseColour(glm::vec3(1.0f, 1.0f, 1.0f));
-	//		}
-	//		else if (bmpVec[a][b] == '_')
-	//		{
-	//			cubeProperty->setDiffuseColour(glm::vec3(0.0f, 0.0f, 0.0f));
-	//		}
-
-	//		DrawObject(pCube, matCube, program);
-
-	//		x -= 30;
-	//	}
-	//	y += 30;
-	//	x = 240;
-	//}
-	//x = 240;
-	//y = -180;
-
-
-
-	//int i = 0;
-	//for (unsigned int a = 0; a < bmpVec.size(); a++)
-	//{
-	//	for (unsigned int b = 0; b < bmpVec[a].size(); b++)
-	//	{
-	//		if (bmpVec[a][b] != '_')
-	//		{
-	//			// Node to the right of current
-	//			if (b + 1 < bmpVec[a].size())
-	//			{
-	//				if (bmpVec[a][b + 1] != '_')
-	//				{
-	//					graph[i].push_back(i + 1);
-	//					graph[i + 1].push_back(i);
-	//				}
-	//			}
-	//			if (a + 1 < bmpVec.size())
-	//			{
-	//				// Node below the current
-	//				if (bmpVec[a + 1][b] != '_')
-	//				{
-	//					graph[i].push_back(i + bmpVec.size());
-	//					graph[i + bmpVec.size()].push_back(i);
-	//				}
-	//			}
-	//			if (a + 1 < bmpVec.size() && b + 1 < bmpVec[a].size())
-	//			{
-	//				// Node below and to the right of current
-	//				if (bmpVec[a + 1][b + 1] != '_')
-	//				{
-	//					graph[i].push_back(i + bmpVec.size() + 1);
-	//					graph[i + bmpVec.size() + 1].push_back(i);
-	//				}
-	//			}
-	//		}
-
-	//		if (bmpVec[a][b] == 'r')
-	//		{
-	//			resources.push_back(i);
-	//		}
-
-	//		if (bmpVec[a][b] == 'g')
-	//		{
-	//			startingNode = i;
-	//		}
-
-	//		i++;
-	//	}
-	//}
 }
 
 void DrawMaze(std::vector<std::vector<char>> bmpVec)
 {
-	Transform* playerTransform = g_player->GetComponent<Transform>();
-
 	int x = 240;
 	int y = 270;
 
@@ -643,9 +584,6 @@ void DrawMaze(std::vector<std::vector<char>> bmpVec)
 			else if (bmpVec[a][b] == 'g')
 			{
 				cubeProperty->setDiffuseColour(glm::vec3(0.0f, 1.0f, 0.0f));
-
-				playerTransform->position = cubeTransform->position;
-				playerTransform->position.z -= 5.0f;
 			}
 			else if (bmpVec[a][b] == 'b')
 			{
