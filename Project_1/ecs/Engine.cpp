@@ -62,7 +62,7 @@ ResourceManager	 gResourceManager;
 int gNumResources = 0;
 int homeNode = 0;
 int startNode = 0;
-std::vector<int> resources;
+std::vector<std::pair<int, bool>> resources;
 std::vector<Node*> dijkstraPathNodes;
 Graph* graph;
 
@@ -240,13 +240,11 @@ int Engine::Run(void)
 	std::vector<std::vector<char>> bmpVec(imageHeight, std::vector<char>(imageWidth));
 
 	int index = 0;
-	unsigned short r, g, b;
 	for (unsigned long x = 0; x < imageWidth; x++) {
 		for (unsigned long y = 0; y < imageHeight; y++) {
 			bmpVec[x][y] = GetColourCharacter(data[index++], data[index++], data[index++]);
 		}
 	}
-
 	swap(bmpVec, imageHeight, imageWidth);
 
 	for (std::vector<char> v : bmpVec)
@@ -258,6 +256,8 @@ int Engine::Run(void)
 
 		printf("\n");
 	}
+
+	std::cout << std::endl;
 
 	CreateGraph(bmpVec);
 
@@ -272,6 +272,7 @@ int Engine::Run(void)
 	stateSearch->AddTransition(1, stateGather);
 	stateGather->AddTransition(1, stateReturn);
 	stateReturn->AddTransition(1, stateSearch);
+	stateSearch->AddTransition(2, stateIdle);
 
 	fsmSystem.AddState(stateIdle);
 	fsmSystem.AddState(stateSearch);
@@ -387,7 +388,7 @@ void Update(void)
 			s->Process(EntityManager::GetEntityList(), dt);
 		}
 
-		if (bHasCollected)
+		if (bHasResource)
 		{
 			Transform* playerTransform = g_player->GetComponent<Transform>();
 			Velocity* playerVelocity = g_player->GetComponent<Velocity>();
@@ -510,7 +511,7 @@ void CreateGraph(std::vector<std::vector<char>> bmpVec)
 
 			if (bmpVec[a][b] == 'r')
 			{
-				resources.push_back(i);
+				resources.push_back(std::make_pair(i, true));
 				gNumResources = resources.size();
 
 			}
@@ -539,26 +540,25 @@ void CreateGraph(std::vector<std::vector<char>> bmpVec)
 		{
 			if (graph->nodes[i + 1]->id != '_')
 			{
-				graph->AddEdge(graph->nodes[i], graph->nodes[i - 15], 14);
 				graph->AddEdge(graph->nodes[i], graph->nodes[i + 1], 10);
-
-				graph->AddEdge(graph->nodes[i - 15], graph->nodes[i], 14);
 				graph->AddEdge(graph->nodes[i + 1], graph->nodes[i], 10);
+
+				if (graph->nodes[i - 16]->id != '_')
+				{
+					graph->AddEdge(graph->nodes[i], graph->nodes[i - 15], 14);
+					graph->AddEdge(graph->nodes[i - 15], graph->nodes[i], 14);
+				}
+
 			}
 			if (graph->nodes[i + 16]->id != '_')
 			{
 				graph->AddEdge(graph->nodes[i], graph->nodes[i + 16], 10);
-				graph->AddEdge(graph->nodes[i], graph->nodes[i + 17], 14);
-
 				graph->AddEdge(graph->nodes[i + 16], graph->nodes[i], 10);
-				graph->AddEdge(graph->nodes[i + 17], graph->nodes[i], 14);
-			}
-			if (graph->nodes[i + 1]->id == '_')
-			{
-				if (graph->nodes[i + 16]->id != '_')
+
+				if (graph->nodes[i + 1]->id != '_')
 				{
-					graph->AddEdge(graph->nodes[i], graph->nodes[i + 16], 10);
-					graph->AddEdge(graph->nodes[i + 16], graph->nodes[i], 10);
+					graph->AddEdge(graph->nodes[i], graph->nodes[i + 17], 14);
+					graph->AddEdge(graph->nodes[i + 17], graph->nodes[i], 14);
 				}
 			}
 		}
@@ -569,6 +569,7 @@ void DrawMaze(std::vector<std::vector<char>> bmpVec)
 {
 	int x = 240;
 	int y = 270;
+	int i = 0;
 
 	for (unsigned int a = 0; a < bmpVec.size(); a++)
 	{
@@ -583,10 +584,24 @@ void DrawMaze(std::vector<std::vector<char>> bmpVec)
 
 			if (bmpVec[a][b] == 'r')
 			{
-				if (bHasCollected)
-					cubeProperty->setDiffuseColour(glm::vec3(1.0f, 1.0f, 1.0f));
+				if (bHasResource)
+				{
+					for (std::pair<int, bool> p : resources)
+					{
+						if (p.first == i && !p.second)
+						{
+							cubeProperty->setDiffuseColour(glm::vec3(1.0f, 1.0f, 1.0f));
+						}
+						else
+						{
+							cubeProperty->setDiffuseColour(glm::vec3(1.0f, 0.0f, 0.0f));
+						}
+					}
+				}
 				else
+				{
 					cubeProperty->setDiffuseColour(glm::vec3(1.0f, 0.0f, 0.0f));
+				}
 			}
 			else if (bmpVec[a][b] == 'g')
 			{
@@ -612,6 +627,7 @@ void DrawMaze(std::vector<std::vector<char>> bmpVec)
 			DrawObject(pCube, matCube, program);
 
 			x -= 30;
+			i++;
 		}
 		y -= 30;
 		x = 240;

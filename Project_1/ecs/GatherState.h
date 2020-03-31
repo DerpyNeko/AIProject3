@@ -19,6 +19,8 @@ public:
 
 	float startTime;
 	float currentTime;
+
+	bool bStartGather = false;
 };
 
 #endif

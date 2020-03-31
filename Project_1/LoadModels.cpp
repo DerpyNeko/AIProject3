@@ -107,6 +107,7 @@ void LoadModelsIntoScene()
 		properties->meshName = "Cube.ply";
 		properties->bDontLight = true;
 		properties->type = eType::NONE;
+		properties->bIsVisible = false;
 
 		Transform* transform = g_box->AddComponent<Transform>();
 		transform->position = glm::vec3(0.0f, 0.0f, -8.0f);

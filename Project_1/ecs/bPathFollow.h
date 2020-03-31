@@ -4,7 +4,8 @@
 #include "Behaviour.h"
 #include <glm/glm.hpp>
 
-extern bool bHasCollected;
+extern bool bHasArrived;
+extern bool bHasResource;
 
 struct PathNode
 {

@@ -10,7 +10,14 @@ IdleState::~IdleState(void)
 
 void IdleState::Update(void) 
 {
-	mCurrentCondition = 1;
+	if (gNumResources != 0)
+	{
+		mCurrentCondition = 1;
+	}
+	else if (gNumResources == 0)
+	{
+		mCurrentCondition = 0;
+	}
 }
 
 void IdleState::EnterState(void) 
@@ -20,5 +27,5 @@ void IdleState::EnterState(void)
 
 void IdleState::ExitState(void) 
 {
-	printf("IdleState: Exited\n");
+	printf("IdleState: Exited\n\n");
 }

@@ -1,7 +1,8 @@
 #include "bPathFollow.h"
 #include "../globalStuff.h"
 
-bool bHasCollected = false;
+bool bHasArrived = false;
+bool bHasResource = false;
 
 PathFollowBehaviour::PathFollowBehaviour(Entity* entity, Path* path)
 	: mEntity(entity), mPath(path), mCurrentGoal(0), mPathRadius(1.5f)
@@ -26,7 +27,8 @@ void PathFollowBehaviour::Update(float dt)
 		if (mCurrentGoal == mPath->pathNodes.size() - 1)
 		{
 			agentVelocity->velocity = glm::vec3(0.001f, 0.001f, 0.0f);
-			bHasCollected = true;
+			bHasArrived = true;
+			bHasResource = true;
 			return;
 		}
 

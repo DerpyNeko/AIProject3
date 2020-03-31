@@ -15,6 +15,18 @@ public:
 	virtual void EnterState(void);
 	virtual void ExitState(void);
 
+	Node* AStar(Node* rootNode, Graph* graph, Node* goal);
+	float CalculateHeuristics(Node* node, Node* goal);
+
+	std::vector<Node*> aStarPathNodes;
+
+	int resourcesHeld;
+
+	bool bUnloadResource = false;
+
+	float startTime;
+	float currentTime;
+
 };
 
 #endif

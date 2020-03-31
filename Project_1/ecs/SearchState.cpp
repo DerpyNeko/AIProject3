@@ -1,10 +1,10 @@
 ﻿#include "SearchState.h"
 
-SearchState::SearchState(void) : FSMState("Search State") 
+SearchState::SearchState(void) : FSMState("Search State")
 {
 }
 
-SearchState::~SearchState(void) 
+SearchState::~SearchState(void)
 {
 }
 
@@ -48,46 +48,44 @@ Node* SearchState::Dijkstra(Node* rootNode, Graph* graph)
 		currNode->visited = true;
 		if (currNode->hasGoal)
 		{
-			std::cout << "NODES:" << std::endl;
-			Node* n = graph->nodes[resources[0]];
+			Node* n = graph->nodes[resources[gNumResources - 1].first];
 
 			while (n->parent != NULL)
 			{
-				std::cout << n->index << " : ";
 				for (std::pair<Node*, float> p : n->parent->children)
 				{
 					if (p.first == n)
 					{
-						std::cout << p.second << std::endl;
 						dijkstraPathNodes.push_back(p.first);
 						break;
 					}
-
 				}
 				n = n->parent;
 			}
 
 			dijkstraPathNodes.push_back(graph->nodes[startNode]);
-			std::cout << graph->nodes[startNode]->index << std::endl;
 			std::reverse(dijkstraPathNodes.begin(), dijkstraPathNodes.end());
 
-			std::cout << "REVERSED NODES:" << std::endl;
+			std::cout << "NODES\tCOST" << std::endl;
 			for (int i = 0; i < dijkstraPathNodes.size(); i++)
 			{
 				std::cout << dijkstraPathNodes[i]->index;
+				if (i == dijkstraPathNodes.size() - 1)
+				{
+					std::cout << "\t" << 0 << std::endl;
+				}
 				for (std::pair<Node*, float> pair : dijkstraPathNodes[i]->children)
 				{
-					if (i + 1 < 16)
+					if (i + 1 < dijkstraPathNodes.size())
 					{
 						if (pair.first == dijkstraPathNodes[i + 1])
 						{
-							std::cout << " : " << pair.second << std::endl;
+							std::cout << "\t" << pair.second << "\tx: " << dijkstraPathNodes[i]->position.x <<"\ty: "<< dijkstraPathNodes[i]->position.y<<std::endl;
 							break;
 						}
 					}
 				}
 			}
-			std::cout << std::endl;
 			return currNode;
 		}
 
@@ -121,32 +119,43 @@ Node* SearchState::Dijkstra(Node* rootNode, Graph* graph)
 	return NULL;
 }
 
-void SearchState::Update(void) 
+void SearchState::Update(void)
 {
-	if (gNumResources == 0) {
+	if (gNumResources == 0)
+	{
 		printf("SearchState: No resources found!\n");
 		mCurrentCondition = 2;
 	}
-	else {
-		printf("SearchState: Found %d resources!\n", gNumResources);
+	else
+	{
+		printf("SearchState: Found %d resource(s)!\n", gNumResources);
 
-		graph->nodes[resources[0]]->hasGoal = true;
-		std::cout << "Starting node: " << graph->nodes[startNode]->index << " Resource: " << graph->nodes[resources[0]]->index << std::endl;
+		graph->nodes[resources[gNumResources - 1].first]->hasGoal = true;
+		
+		std::cout << "Starting node: " << graph->nodes[startNode]->index << " Resource: " << graph->nodes[resources[gNumResources - 1].first]->index << std::endl;
 		Node* n = Dijkstra(graph->nodes[startNode], graph);
 
-		if (n == graph->nodes[resources[0]])
+		if (n == graph->nodes[resources[gNumResources - 1].first])
 		{
-			gNumResources--;
-		}
+			graph->nodes[resources[gNumResources - 1].first]->hasGoal = false;
 
-		mCurrentCondition = 1;
+			startNode = graph->nodes[resources[gNumResources - 1].first]->index;
+
+			resources[gNumResources - 1].second = false;
+
+			gNumResources--;
+
+			mCurrentCondition = 1;
+		}
 	}
 }
 
-void SearchState::EnterState(void) {
+void SearchState::EnterState(void) 
+{
 	printf("SearchState: Entered\n");
 }
 
-void SearchState::ExitState(void) {
-	printf("SearchState: Exited\n");
+void SearchState::ExitState(void) 
+{
+	printf("SearchState: Exited\n\n");
 }

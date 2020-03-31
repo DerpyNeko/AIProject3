@@ -16,7 +16,8 @@ extern int startNode;
 extern Graph* graph;
 extern std::vector<Node*> dijkstraPathNodes;
 
-extern std::vector<int> resources;
+// int -> node index, bool -> IsAvailable
+extern std::vector<std::pair<int, bool>> resources;
 extern Transform* playerTransform;
 extern Velocity* playerVelocity;
 

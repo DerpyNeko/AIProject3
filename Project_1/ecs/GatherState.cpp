@@ -2,7 +2,7 @@
 #include "Behaviour.h"
 #include "../globalStuff.h"
 
-GatherState::GatherState(void) : FSMState("Search State"), currentTime(0), resourcesHeld(0), startTime(0)
+GatherState::GatherState(void) : FSMState("Search State")
 {
 }
 
@@ -12,16 +12,24 @@ GatherState::~GatherState(void)
 
 void GatherState::Update(void)
 {
-	if (bHasCollected)
+	if (bHasArrived)
 	{
-		std::cout << "Arrived" << std::endl;
+		if (bStartGather)
+		{
+			std::cout << "Arrived\nNow gathering" << std::endl;
+
+			startTime = (float)std::clock();
+			bStartGather = false;
+		}
 
 		currentTime = (float)std::clock();
+
 		if ((currentTime - startTime) / (float)CLOCKS_PER_SEC > 7.0f)
 		{
 			resourcesHeld++;
-			//resources.erase(resources.begin());
 			std::cout << "Resource gathered" << std::endl;
+			Properties* p = g_box->GetComponent<Properties>();
+			p->bIsVisible = true;
 
 			// gathering done
 			mCurrentCondition = 1;
@@ -29,13 +37,13 @@ void GatherState::Update(void)
 	}
 }
 
-void GatherState::EnterState(void) 
+void GatherState::EnterState(void)
 {
 	printf("GatherState: Entered\n");
 
+	bStartGather = true;
 	resourcesHeld = 0;
-	startTime = (float)std::clock();
-	currentTime = 0.0f;
+	bHasArrived = false;
 
 	Path* path = new Path();
 
@@ -50,10 +58,12 @@ void GatherState::EnterState(void)
 	}
 
 	gBehaviourManager.SetBehaviour(g_player, new PathFollowBehaviour(g_player, path));
+	std::cout << "Travelling to resource" << std::endl;
 }
 
-void GatherState::ExitState(void) 
+void GatherState::ExitState(void)
 {
-	printf("GatherState: Exited\n");
-	std::cout << "Resources: " << resources.size() << std::endl;
+	printf("GatherState: Exited\n\n");
+	dijkstraPathNodes.clear();
+
 }
